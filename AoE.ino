@@ -1,13 +1,17 @@
 #include <math.h>
+#include <stdio.h>
 
 #define LIGHT1 22
 #define BUTTON1 23
 
-int numButtons = 2;
+int numButtons = 3;
 
-int buttons[2];
-int leds[2];
-unsigned long times[2];
+int buttons[3];
+int leds[3];
+unsigned long times[3];
+unsigned long pressDelay[3];
+
+unsigned long scoreDelay = 1000;
 
 unsigned long previousButtonAssignment;
 unsigned long buttonDelay = 4000;
@@ -28,8 +32,9 @@ void setup() {
   }
 
   Serial.begin(9600);
+  Serial1.begin(9600);
 
-  Serial.println("STARTING: ");
+  /*Serial.println("STARTING: ");
   Serial.println("+-----------------+");
   for (int i = 0; i < numButtons; i++) {
     Serial.print("BUTTON i = " + i);
@@ -39,7 +44,7 @@ void setup() {
     Serial.print("LED i = " + i);
     Serial.println(leds[i]);
   }
-  Serial.println("+-----------------+");
+  Serial.println("+-----------------+");*/
 }
 
 void loop() {
@@ -57,11 +62,18 @@ void loop() {
     buttons[i] = digitalRead(23 + 2 * i); // update buttons array
 
     if (buttons[i] == 0) { // if button[i] pressed
-      if (leds[i] == 1) {
-        leds[i] = 0;                        // turn off leds[i]
-        score++;
-      } else {
-        score--;
+      Serial.print(pressDelay[i]);
+      Serial.print(" ");
+      Serial.println(millis());
+      if (millis() - pressDelay[i] >= scoreDelay) {
+        if (leds[i] == 1) {
+          leds[i] = 0;                        // turn off leds[i]
+          score++;
+          pressDelay[i] = millis();
+        } else {
+          score--;
+          pressDelay[i] = millis();
+        }
       }
     }
   }
@@ -81,7 +93,7 @@ void loop() {
 }
 
 void printStuff(unsigned long t, int n) {
-  Serial.println("+-----------------+");
+  /*Serial.println("+-----------------+");
   Serial.println(t);
   Serial.println(n);
   for (int i = 0; i < numButtons; i++) {
@@ -92,5 +104,7 @@ void printStuff(unsigned long t, int n) {
     Serial.print("LED i = " + i);
     Serial.println(leds[i]);
   }
-  Serial.println("+-----------------+");
+  Serial.println("+-----------------+");*/
+  Serial1.print("Score: ");
+  Serial1.println(score);
 }
